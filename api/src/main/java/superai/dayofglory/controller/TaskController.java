@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import superai.dayofglory.dto.TaskRequestDTO;
 import superai.dayofglory.models.Task;
 import superai.dayofglory.service.TaskService;
 
@@ -22,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin("*")
+@CrossOrigin
 public class TaskController {
 
     @Autowired

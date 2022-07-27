@@ -2,6 +2,8 @@ package superai.dayofglory.models;
 
 public class PicAnnotation {
     private String tag;
+
+    private Geometry geometry;
     public String getTag() {
         return tag;
     }
