@@ -2,10 +2,10 @@
 FROM node:alpine as builder
 
 # set the working dir for container
-WORKDIR /contactlist-frontend
+WORKDIR /dayofglory-frontend
 
 # copy the json file first
-COPY ./package.json /contactlist-frontend
+COPY ./package.json /dayofglory-frontend
 
 # install npm dependencies
 RUN npm install
@@ -13,7 +13,7 @@ RUN npm install
 # copy other project files
 COPY . .
 
-RUN chmod -r 777  /contactlist-frontend
+RUN chmod -r 777  /dayofglory-frontend
 
 USER node
 
