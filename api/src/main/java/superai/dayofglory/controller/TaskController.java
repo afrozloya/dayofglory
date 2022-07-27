@@ -1,7 +1,6 @@
 package superai.dayofglory.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import superai.dayofglory.misc.TaskStatus;
+import org.springframework.web.multipart.MultipartFile;
+import superai.dayofglory.dto.TaskRequestDTO;
 import superai.dayofglory.models.Task;
-import superai.dayofglory.repositories.TaskRepository;
+import superai.dayofglory.service.TaskService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -25,46 +26,37 @@ import java.util.List;
 public class TaskController {
 
     @Autowired
-    TaskRepository taskRepository;
+    TaskService taskService;
 
     @GetMapping("/tasks")
     public List<Task> getAllTasks() {
-        Sort sortByCreatedAtDesc = Sort.by(Sort.Direction.DESC, "createdAt");
-        return taskRepository.findAll(sortByCreatedAtDesc);
+        return taskService.getAllTasks();
     }
 
     @PostMapping("/tasks")
-    public Task createTask(@Valid @RequestBody Task task) {
-        task.setStatus(TaskStatus.ACTIVE.name());
-        return taskRepository.save(task);
+    public Task createTask(@RequestParam("file") MultipartFile file) {
+        return taskService.createTask(file);
     }
 
     @GetMapping(value="/tasks/{id}")
     public ResponseEntity<Task> getTaskById(@PathVariable("id") String id) {
-        return taskRepository.findById(id)
+        return taskService.getTaskById(id)
                 .map(task -> ResponseEntity.ok().body(task))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping(value="/task/{id}")
+    @PutMapping(value="/tasks/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable("id") String id,
                                            @Valid @RequestBody Task task) {
-        return taskRepository.findById(id)
+        return taskService.updateTask(id, task)
                 .map(taskData -> {
-                    taskData.setAnotations(task.getAnotations());
-                    taskData.setStatus(TaskStatus.READY.name());
-                    taskData.setVersion(taskData.getVersion()+1);
-                    Task updatedTask = taskRepository.save(taskData);
-                    return ResponseEntity.ok().body(updatedTask);
+                    return ResponseEntity.ok().body(taskData);
                 }).orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping(value="/task/{id}")
+    @DeleteMapping(value="/tasks/{id}")
     public ResponseEntity<?> deleteTask(@PathVariable("id") String id) {
-        return taskRepository.findById(id)
-                .map(task -> {
-                    taskRepository.deleteById(id);
-                    return ResponseEntity.ok().build();
-                }).orElse(ResponseEntity.notFound().build());
+        boolean deleted = taskService.deleteTask(id);
+        return  deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }
