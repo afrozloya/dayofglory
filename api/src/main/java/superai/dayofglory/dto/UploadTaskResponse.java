@@ -1,4 +1,4 @@
-package superai.dayofglory.payload;
+package superai.dayofglory.dto;
 
 
 public class UploadTaskResponse {
